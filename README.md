@@ -216,5 +216,5 @@ Environment variables commonly needed:
 - `BW_SESSION` for Bitwarden CLI
 - `SLACK_TOKEN` or `SLACK_BOT_TOKEN` for Slack messaging
 - `TWINGATE_API_KEY` for Twingate GraphQL API
-- `IBMCLOUD_API_KEY` for Adding user to SSL VPN
+- `IBMCLOUD_API_KEY` for Adding user to SSL VPN using IBMCLOUD CLI
 

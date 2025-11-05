@@ -107,14 +107,15 @@ try {
         $effectiveDomain = if ($_.PSObject.Properties.Name -contains 'Domain' -and $_.Domain) { $_.Domain } else { $Domain }
         $idValue = if ($_.PSObject.Properties.Name -contains 'Id' -and $_.Id) { $_.Id } else { "$( $_.Name )@$effectiveDomain" }
         [PSCustomObject]@{
-            Name         = $_.Name
-            Domain       = $effectiveDomain
-            Id           = $idValue
-            FirstName    = if ($_.PSObject.Properties.Name -contains 'FirstName') { $_.FirstName } else { $null }
-            LastName     = if ($_.PSObject.Properties.Name -contains 'LastName') { $_.LastName } else { $null }
-            EmailAddress = if ($_.PSObject.Properties.Name -contains 'EmailAddress') { $_.EmailAddress } else { $null }
-            Disabled     = if ($_.PSObject.Properties.Name -contains 'Disabled') { $_.Disabled } else { $null }
-            Locked       = if ($_.PSObject.Properties.Name -contains 'Locked') { $_.Locked } else { $null }
+            Name          = $_.Name
+            Domain        = $effectiveDomain
+            Id            = $idValue
+            vCenterServer = $vCenterServer
+            FirstName     = if ($_.PSObject.Properties.Name -contains 'FirstName') { $_.FirstName } else { $null }
+            LastName      = if ($_.PSObject.Properties.Name -contains 'LastName') { $_.LastName } else { $null }
+            EmailAddress  = if ($_.PSObject.Properties.Name -contains 'EmailAddress') { $_.EmailAddress } else { $null }
+            Disabled      = if ($_.PSObject.Properties.Name -contains 'Disabled') { $_.Disabled } else { $null }
+            Locked        = if ($_.PSObject.Properties.Name -contains 'Locked') { $_.Locked } else { $null }
         }
     }
 

@@ -4,6 +4,7 @@ This repository contains scripts to automate provisioning and onboarding tasks f
 
 ### Overview
 - **New-vCenterUsersFromCsv.ps1**: Creates SSO users in vCenter, ensures group membership, and outputs credentials.
+- **Export-VcenterDomainUsersToCsv.ps1**: Exports all SSO users from a specified SSO domain to CSV (includes the vCenter name column).
 - **Create-BWSendsFromCsv.ps1**: Generates Bitwarden Sends for credentials and produces shareable access links.
 - **send-bw-links-to-slack.ps1**: Direct-messages users on Slack with their Bitwarden Send link and vCenter URL.
 - **twingate.ps1**: Creates Twingate users and optionally adds them to a Twingate group.
@@ -45,6 +46,34 @@ pwsh -File New-vCenterUsersFromCsv.ps1 \
   -vCenterServer 'vcenter.vsphere.com' \
   -SsoDomain 'vsphere.com' \
   -OutputPasswordFile ./new-users-passwords-devqe.csv
+```
+
+---
+
+### Export-VcenterDomainUsersToCsv.ps1
+Exports all vCenter SSO person users from a specified SSO domain (e.g., `vsphere.local`) and writes them to a CSV.
+
+Requirements:
+- PowerShell 7+ (pwsh)
+- VMware.PowerCLI module
+- VMware.vSphere.SsoAdmin module
+
+Key parameters:
+- `-vCenterServer <fqdn>`: vCenter hostname.
+- `-Domain <sso-domain>`: SSO domain to export (e.g., `vsphere.local`).
+- `-Credential <PSCredential>`: SSO credential; prompts if not supplied.
+- `-OutputCsv <path>`: Output CSV file path.
+- `-InstallModules`: Install required PowerShell modules if missing.
+
+Output CSV columns:
+- `Name, Domain, Id, vCenterServer, FirstName, LastName, EmailAddress, Disabled, Locked`
+
+Example:
+```bash
+pwsh -File Export-VcenterDomainUsersToCsv.ps1 \
+  -vCenterServer 'vcenter.vsphere.com' \
+  -Domain 'vsphere.local' \
+  -OutputCsv ./exported-users-vsphere-local.csv
 ```
 
 ---

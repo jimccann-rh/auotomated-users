@@ -118,6 +118,15 @@ query Groups($first: Int, $after: String) {
 }
 '@
 
+$queryUsers = @'
+query Users($first: Int, $after: String) {
+  users(first: $first, after: $after) {
+    edges { node { id email } }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+'@
+
 $mutationGroupUpdate = @'
 mutation GroupUpdate($groupId: ID!, $addedUserIds: [ID!]) {
   groupUpdate(id: $groupId, addedUserIds: $addedUserIds) {
@@ -180,7 +189,34 @@ foreach ($row in $rowsData) {
   $groupErr = $null
   $groupId = $null
 
-  if ($userOk -and $userId -and $groupName -and $groupName.Trim() -ne '') {
+  # If user was not created (e.g., already exists), resolve existing user ID by email
+  if (-not $userId) {
+    $resolvedUserId = $null
+    $afterUser = $null
+    do {
+      $usersBody = @{
+        query     = $queryUsers
+        variables = @{ first = 200; after = $afterUser }
+      } | ConvertTo-Json -Depth 5
+      $usersResp = Invoke-RestMethod -Uri "https://$subdomain.twingate.com/api/graphql/" -Method Post -Headers $headers -Body $usersBody
+      $uEdges = $usersResp.data.users.edges
+      foreach ($edge in $uEdges) {
+        $edgeEmail = if ($edge.node.email) { [string]$edge.node.email.Trim().ToLowerInvariant() } else { $null }
+        if ($edgeEmail -and $edgeEmail -eq $email.Trim().ToLowerInvariant()) {
+          $resolvedUserId = $edge.node.id
+          break
+        }
+      }
+      $uPage = $usersResp.data.users.pageInfo
+      $hasNextU = if ($uPage) { [bool]$uPage.hasNextPage } else { $false }
+      $afterUser = if ($uPage) { $uPage.endCursor } else { $null }
+    } while (-not $resolvedUserId -and $hasNextU)
+    if ($resolvedUserId) {
+      $userId = $resolvedUserId
+    }
+  }
+
+  if ($userId -and $groupName -and $groupName.Trim() -ne '') {
     $key = $groupName.ToLowerInvariant()
     if ($groupMap.ContainsKey($key)) {
       $groupId = $groupMap[$key]
